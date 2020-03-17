@@ -8,32 +8,11 @@ library(scales)
 
 # Data
 
-COVID <- read_excel("COVID19.xls")
-
 rsa <- read_excel("COVID_RSA.xlsx")
 
-# Country DF South Africa
-
-rsa <-  as.data.frame(COVID[COVID$CountryExp=="South Africa",])
-
-rsa %>% 
-  select(DateRep, NewConfCases)
+# Country DF South Africa and checking the totals
 
 sum(rsa$NewConfCases)
-
-# fix case numbers in dataframe
-
-rsa$NewConfCases[]
-
-rsa$NewConfCases[2] <- 14
-
-rsa$NewConfCases[1] <- 23
-
-today <- "2020-03-16"
-
-rbind(rsa, list(as.Date(today, "%Y-%m-%d"),  "South Africa", 1, 0, "ZA", NA, "Non-EU/EEA"))
-
-
 
 # Poisson model
 
@@ -84,7 +63,6 @@ ggplot(futurersa) +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-17")), linetype="dashed") +
   scale_x_date(date_labels="%m-%d", date_breaks="3 days") +
   theme_bw()
-
 ggsave("coronaRSA.png")
 
 # Localized by points model
