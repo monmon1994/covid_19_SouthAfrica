@@ -8,11 +8,35 @@ library(scales)
 
 # Data
 
+COVID <- read_excel("COVID19.xls")
+
 rsa <- read_excel("COVID_RSA.xlsx")
 
-# Country DF South Africa and checking the totals
+# Country DF South Africa
+
+rsa <-  as.data.frame(COVID[COVID$CountryExp=="South Africa",])
+
+rsa %>% 
+  select(DateRep, NewConfCases)
 
 sum(rsa$NewConfCases)
+
+# fix case numbers in dataframe
+
+rsa$NewConfCases[]
+
+rsa$NewConfCases[2] <- 14
+
+rsa$NewConfCases[1] <- 23
+
+today <- "2020-03-16"
+
+rbind(rsa, list(as.Date(today, "%Y-%m-%d"),  "South Africa", 1, 0, "ZA", NA, "Non-EU/EEA"))
+
+rsa$DateRep <-  format(rsa$DateRep, "%Y-%m-%d")
+
+rsa$DateRep <-  as.Date(as.POSIXct(rsa$DateRep), "%Y-%m-%d")
+
 
 # Poisson model
 
@@ -32,7 +56,7 @@ ggplot(rsa) +
   theme_bw()
 
 # Future values
-future <- data.frame(DateRep=seq(as.Date("2020-03-17", "%Y-%m-%d"), as.Date("2020-06-30", "%Y-%m-%d"), by="days"))
+future <- data.frame(DateRep=seq(as.Date("2020-03-18", "%Y-%m-%d"), as.Date("2020-06-30", "%Y-%m-%d"), by="days"))
 
 future$DateRep <- as.POSIXct(future$DateRep, "%Y-%m-%d")
 
@@ -45,7 +69,7 @@ ggplot(rsa) +
 
 # Past and future poisson
 futurersa <- dplyr::bind_rows(rsa, future)
-futurersa <- futurersa[futurersa$DateRep < "2020-03-20",]
+futurersa <- futurersa[futurersa$DateRep < "2020-03-18",]
 futurersa$DateRep <- as.Date(futurersa$DateRep)
 
 ggplot(futurersa) +
@@ -60,7 +84,7 @@ ggplot(futurersa) +
         plot.subtitle = element_text(hjust=0.5, family = "serif")) +
   geom_text(aes(x=DateRep, y=futurepredicted, label=round(futurepredicted,0)), vjust = 1, 
             hjust=-0.3, size = 3,col="magenta3") +
-  geom_vline(xintercept = as.numeric(as.Date("2020-03-17")), linetype="dashed") +
+  geom_vline(xintercept = as.numeric(as.Date("2020-03-18")), linetype="dashed") +
   scale_x_date(date_labels="%m-%d", date_breaks="3 days") +
   theme_bw()
 ggsave("coronaRSA.png")
